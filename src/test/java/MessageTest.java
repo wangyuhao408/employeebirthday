@@ -5,7 +5,8 @@ public class MessageTest {
     @Test
     public void readTxtFileTest() {
         Message message = new Message();
-        StringBuilder result = message.readTxtFile("../employee_records.txt");
+        String result = message.readTxtFile("../employee_records.txt");
+        System.out.println(result);
         Assert.assertNotNull(result);
     }
 }
