@@ -19,59 +19,12 @@ import static sun.security.x509.X509CertInfo.SUBJECT;
 
 
 public class Message {
-    public static void sendBirthGreeting(String text){
-        Date date = new Date();
-        SimpleDateFormat df = new SimpleDateFormat("MM-dd");
-        Arrays.stream(text.split("\r\n")).forEach( s -> {
-                if (s.split(",")[2].split("/")[1].equals(df.format(date).split("-"))) {
-                        sendEMail(s.split(",")[0], s.split(",")[3]);
-                }
-        });
-    }
-
-    private static void sendEMail(String recipient, String Email){
-            String host = "smtp.qq.com";
-            Properties properties = System.getProperties();
-            properties.setProperty("mail.smtp.host", host);
-            properties.put("mail.smtp.auth", "true");
-        MailSSLSocketFactory sf = null;
-        try {
-            sf = new MailSSLSocketFactory();
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        }
-        sf.setTrustAllHosts(true);
-            properties.put("mail.smtp.ssl.enable", "true");
-            properties.put("mail.smtp.ssl.socketFactory", sf);
-
-            Session session = Session.getDefaultInstance(properties,new Authenticator(){
-                public PasswordAuthentication getPasswordAuthentication()
-                {
-                    return new PasswordAuthentication("1197856100@qq.com", "obipoqwiggvygffc"); //发件人邮件用户名、密码
-                }
-            });
-
-            try{
-                MimeMessage message = new MimeMessage(session);
-                message.setFrom(new InternetAddress("1197856100@qq.com"));
-                message.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(Email));
-                message.setSubject("happy birthday");
-                message.setText("happy birthday, Dear" + recipient);
-
-                // 发送消息
-                Transport.send(message);
-                System.out.println("发送短信成功");
-            }catch (MessagingException mex) {
-                mex.printStackTrace();
-            }
-        }
-
 
     public static String readTxtFile(String filePath){
             StringBuilder text = new StringBuilder();
             try {
                 String encoding = "GBK";
-                File file = new File(filePath);
+                java.io.File file = new java.io.File(filePath);
                 if (file.isFile() && file.exists()) {
                     InputStreamReader read = new InputStreamReader(
                             new FileInputStream(file), encoding);
