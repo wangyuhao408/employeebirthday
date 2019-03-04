@@ -19,34 +19,28 @@ import static sun.security.x509.X509CertInfo.SUBJECT;
 
 
 public class Message {
-    public static void sendBirthGreeting(String filePath){
+    public static void sendBirthGreeting(String text){
         Date date = new Date();
         SimpleDateFormat df = new SimpleDateFormat("MM-dd");
-        String text = readTxtFile(filePath);
-        System.out.println((text.split(",")[0]));
-        System.out.println(text.split(",")[0].split(",")[2]);
         Arrays.stream(text.split("\r\n")).forEach( s -> {
-            try {
-                if (df.parse(s.split(",")[2]).equals(df.format(date))) {
-                    try {
+                if (s.split(",")[2].split("/")[1].equals(df.format(date).split("-"))) {
                         sendEMail(s.split(",")[0], s.split(",")[3]);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                 }
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
         });
     }
 
-    private static void sendEMail(String recipient, String Email) throws GeneralSecurityException {
+    private static void sendEMail(String recipient, String Email){
             String host = "smtp.qq.com";
             Properties properties = System.getProperties();
             properties.setProperty("mail.smtp.host", host);
             properties.put("mail.smtp.auth", "true");
-            MailSSLSocketFactory sf = new MailSSLSocketFactory();
-            sf.setTrustAllHosts(true);
+        MailSSLSocketFactory sf = null;
+        try {
+            sf = new MailSSLSocketFactory();
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        }
+        sf.setTrustAllHosts(true);
             properties.put("mail.smtp.ssl.enable", "true");
             properties.put("mail.smtp.ssl.socketFactory", sf);
 
