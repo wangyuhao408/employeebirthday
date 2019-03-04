@@ -1,7 +1,10 @@
+import com.sun.mail.util.MailSSLSocketFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -11,7 +14,8 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-
+import static javax.swing.text.html.HTML.Attribute.CONTENT;
+import static sun.security.x509.X509CertInfo.SUBJECT;
 
 
 public class Message {
@@ -36,52 +40,37 @@ public class Message {
         });
     }
 
-    private static void sendEMail(String recipient, String Email) throws Exception {
-            // 收件人电子邮箱
-            String to = Email;
-
-            // 发件人电子邮箱
-            String from = "1197856100@qq.com";
-
-            // 指定发送邮件的主机为 localhost
-            String host = "smtp.163.com";
-
-            // 获取系统属性
+    private static void sendEMail(String recipient, String Email) throws GeneralSecurityException {
+            String host = "smtp.qq.com";
             Properties properties = System.getProperties();
-
-            // 设置邮件服务器
             properties.setProperty("mail.smtp.host", host);
+            properties.put("mail.smtp.auth", "true");
+            MailSSLSocketFactory sf = new MailSSLSocketFactory();
+            sf.setTrustAllHosts(true);
+            properties.put("mail.smtp.ssl.enable", "true");
+            properties.put("mail.smtp.ssl.socketFactory", sf);
 
-            properties.setProperty("mail.smtp.auth", "true");
-            MyAuthenticator myauth = new MyAuthenticator(from, "你自己的信箱密码");
-
-            // 获取默认session对象
-            Session session = Session.getDefaultInstance(properties, myauth);
+            Session session = Session.getDefaultInstance(properties,new Authenticator(){
+                public PasswordAuthentication getPasswordAuthentication()
+                {
+                    return new PasswordAuthentication("1197856100@qq.com", "obipoqwiggvygffc"); //发件人邮件用户名、密码
+                }
+            });
 
             try{
-                // 创建默认的 MimeMessage 对象
                 MimeMessage message = new MimeMessage(session);
-
-                // Set From: 头部头字段
-                message.setFrom(new InternetAddress(from));
-
-                // Set To: 头部头字段
-                message.addRecipient(javax.mail.Message.RecipientType.TO,
-                        new InternetAddress(to));
-
-                // Set Subject: 头部头字段
-                message.setSubject("happy birthday!");
-
-                // 设置消息体
-                message.setText("happy birthday, dear" + recipient);
+                message.setFrom(new InternetAddress("1197856100@qq.com"));
+                message.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(Email));
+                message.setSubject("happy birthday");
+                message.setText("happy birthday, Dear" + recipient);
 
                 // 发送消息
-                javax.mail.Transport.send(message);
-                System.out.println("Sent message successfully....");
+                Transport.send(message);
+                System.out.println("发送短信成功");
             }catch (MessagingException mex) {
                 mex.printStackTrace();
             }
-    }
+        }
 
 
     public static String readTxtFile(String filePath){
